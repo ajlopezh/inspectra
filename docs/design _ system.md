@@ -1,227 +1,285 @@
-# Project Scope – Inspectra (MVP v1.2)
+# Design System – Inspectra (MVP v1.0)
 
 ---
 
-## 1. Descripción General
+## 1. Design Philosophy
 
-Inspectra es una aplicación web para inspección de calidad industrial.
+Inspectra adopta una estética japonesa minimalista.
 
-Su objetivo es digitalizar checklists de inspección de bobinas de acero, estructurar la captura de datos desde el origen y generar análisis automáticos básicos que apoyen procesos de mejora continua.
+Principios fundamentales:
 
-El MVP está enfocado exclusivamente en inspección de bobinas de acero.
+- Simplicidad visual.
+- Jerarquía clara.
+- Colores limitados.
+- Interfaz silenciosa y ordenada.
+- Sensación de calma y precisión.
 
-La aplicación debe desarrollarse utilizando:
+La experiencia debe transmitir:
 
-- HTML
-- CSS
-- JavaScript
-- React
-- Firebase (Authentication + Firestore)
-
-No se deben utilizar tecnologías externas adicionales ni servicios pagos.
-
----
-
-## 2. Usuario Objetivo
-
-El sistema está dirigido a:
-
-- Supervisores de calidad.
-- Inspectores industriales.
-- Personal responsable de auditorías técnicas.
-
-Usuarios que necesitan:
-
-- Registrar defectos de manera estructurada.
-- Visualizar métricas básicas de calidad.
-- Exportar información para análisis externo.
+- Facilidad de uso.
+- Claridad mental.
+- Control sin saturación visual.
 
 ---
 
-## 3. Funcionalidades Principales (Core Features)
+## 2. Design Approach
 
-### 3.1 Autenticación de Usuario
+### Mobile First (Obligatorio)
 
-- Registro e inicio de sesión mediante Email y Password.
-- Autenticación implementada con Firebase Authentication.
-- Cada usuario debe tener un rol asignado:
-  - "admin"
-  - "executor"
-- El sistema debe restringir acceso a rutas protegidas si el usuario no está autenticado.
+El diseño debe construirse primero para pantallas móviles.
 
----
+Base width de referencia:
+- 375px
 
-### 3.2 Registro de Auditorías
+Breakpoints:
 
-El usuario puede diligenciar un checklist fijo para inspección de bobinas de acero con los siguientes campos:
-
-- Fecha de auditoría
-- Nombre del proveedor
-- ID de la bobina
-- Defecto 1
-- Defecto 2 (opcional)
-- Defecto 3 (opcional)
-- Observaciones
+- Mobile: 0px – 767px (base)
+- Tablet: 768px+
+- Desktop: 1024px+
 
 Reglas:
 
-- defect1 es obligatorio.
-- defect2 y defect3 son opcionales.
-- Si defect1 = "Sin defecto":
-  - defect2 y defect3 deben guardarse como null.
-  - La auditoría se marca automáticamente como conforme.
-- Si defect1 es diferente de "Sin defecto":
-  - La auditoría se marca como no conforme.
-
-Cada auditoría debe almacenarse como un documento independiente en la colección "audits" en Firestore.
+- Layout vertical por defecto.
+- Botones full-width en móvil.
+- Cards apiladas verticalmente.
+- Márgenes amplios.
+- Navegación superior simple (sin sidebar en MVP).
 
 ---
 
-### 3.3 Visualización de las auditorías realizadas en formato tabla
+## 3. Color Palette
 
-El usuario puede poder ver en una tabla, al estilo de excel, toda las auditorías realizadas.
+La paleta debe ser limitada y equilibrada.
 
-Requisitos:
+### Primario (Acción)
+- #1F3A5F (Azul profundo japonés)
+Usar en:
+- Botones principales
+- Enlaces activos
+- Elementos destacados
 
-- La tabla debe tener títulos adecuados y las filas serán los datos registrados para todas las auditorías realizadas.
-- Incluir todos los campos almacenados.
+### Secundario (Éxito)
+- #4C7A57 (Verde suave)
+Usar en:
+- Mensajes de confirmación
+- Indicadores positivos
 
----
+### Fondo General
+- #FAFAF7 (Blanco cálido)
+Evita el blanco puro para reducir fatiga visual.
 
-### 3.4 Dashboard de Métricas
+### Superficie (Cards)
+- #FFFFFF
 
-El sistema debe mostrar una vista principal con:
+### Texto Principal
+- #2E2E2E (Gris oscuro suave)
 
-- Total de auditorías registradas.
-- Número de auditorías conformes.
-- Porcentaje de conformidad.
-- Gráfico tipo Pareto de defectos.
+### Texto Secundario
+- #6B6B6B (Gris medio)
 
-Reglas del Pareto:
+### Error
+- #B23A3A (Rojo tenue)
 
-- Contar defect1, defect2 y defect3.
-- Excluir valores null.
-- Excluir "Sin defecto".
-- Ordenar de mayor a menor frecuencia.
-- Visualizar usando Chart.js.
-
-Todos los cálculos deben realizarse en el frontend (client-side).
-
----
-
-### 3.5 Exportación de Datos
-
-El usuario puede exportar todas las auditorías registradas en formato CSV.
-
-Requisitos:
-
-- Generación del archivo en el frontend usando JavaScript.
-- Incluir todos los campos almacenados.
-- Nombre del archivo:
-  inspectra_audits_YYYYMMDD.csv
+Regla:
+No utilizar colores adicionales fuera de esta paleta en el MVP.
 
 ---
 
-## 4. Roles de Usuario (MVP)
+## 4. Typography
 
-El sistema debe manejar dos roles:
+### Fuente Principal
+- 'Inter', sans-serif
 
-### Administrator ("admin")
+Fallback:
+- system-ui, sans-serif
 
-- Puede crear auditorías.
-- Puede visualizar todas las auditorías.
-- Puede acceder al dashboard.
-- Puede exportar datos.
-- No puede eliminar auditorías.
+### Jerarquía
 
-### Executor ("executor")
+H1:
+- 28px (mobile)
+- 32px (desktop)
+- font-weight: 600
 
-- Puede crear auditorías.
-- Puede visualizar todas las auditorías (en el MVP).
-- Puede acceder al dashboard.
-- Puede exportar datos.
-- No puede eliminar auditorías.
+H2:
+- 20px
+- font-weight: 600
 
-Nota:
-El aislamiento de datos entre ejecutores no forma parte del MVP.
+Texto cuerpo:
+- 16px
+- font-weight: 400
+- line-height: 1.6
 
----
-
-## 5. Modelo de Datos (Firestore)
-
-Cada auditoría debe almacenarse en la colección:
-
-`audits`
-
-Estructura obligatoria del documento:
-
-{
-  auditDate: Timestamp,
-  providerName: string,
-  coilId: string,
-  defect1: string,
-  defect2: string | null,
-  defect3: string | null,
-  observations: string,
-  isConform: boolean,
-  createdAt: Timestamp,
-  createdBy: string
-}
+Texto pequeño:
+- 14px
 
 Reglas:
 
-- createdAt debe generarse automáticamente al guardar.
-- createdBy debe contener el UID del usuario autenticado.
-- No incluir el campo role dentro del documento audit.
+- No usar más de 2 pesos tipográficos.
+- Mantener alto contraste con el fondo.
+- Evitar texto excesivamente pequeño.
 
 ---
 
-## 6. Reglas de Negocio
+## 5. Spacing System
 
-- El usuario debe estar autenticado para acceder al sistema.
-- defect1 es obligatorio.
-- defect2 y defect3 deben ser null si defect1 = "Sin defecto".
-- No se permite eliminación de auditorías.
-- No se permite creación dinámica de checklists en el MVP.
-- Todos los cálculos del dashboard deben realizarse en el frontend.
-- La aplicación debe seguir el enfoque Mobile First.
+Base unit: 8px
 
----
+Escala permitida:
 
-## 7. Exclusiones del MVP (Non-Goals)
+- 4px
+- 8px
+- 16px
+- 24px
+- 32px
+- 48px
 
-No incluir en esta versión:
+Reglas:
 
-- Carga de imágenes.
-- Firebase Storage.
-- Checklists dinámicos.
-- Gestión avanzada de usuarios desde interfaz.
-- Eliminación de registros.
-- Aislamiento de datos por proveedor.
-- Inteligencia Artificial.
-- Backend adicional distinto a Firebase.
+- Utilizar múltiplos de 8px para márgenes y padding.
+- Priorizar más espacio en lugar de compactación.
+- El espacio en blanco es parte esencial del diseño.
 
 ---
 
-## 8. Roadmap Futuro (Referencia)
+## 6. Border Radius & Shadows
 
-v1.2 → Carga de imágenes.  
-v2.0 → Aislamiento de datos por proveedor.  
-v3.0 → Checklists personalizables.  
-v4.0 → Asistente IA para clasificación automática.
+Border-radius:
+
+- Inputs: 8px
+- Botones: 10px
+- Cards: 12px
+
+Sombras:
+
+Cards:
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+Hover ligero:
+box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+
+Regla:
+Sombras siempre sutiles. No usar sombras fuertes ni dramáticas.
 
 ---
 
-## 9. Filosofía del Producto
+## 7. UI Components
 
-Inspectra no es solo un formulario digital.
+### 7.1 Buttons
 
-Es un sistema orientado a:
+Primary Button:
 
-- Captura estructurada de datos.
-- Estandarización.
-- Trazabilidad.
-- Medición objetiva.
-- Soporte a la mejora continua.
+- Background: #1F3A5F
+- Color texto: #FFFFFF
+- Border-radius: 10px
+- Padding: 12px 16px
+- Width: 100% en mobile
+- Transition: 0.2s ease
 
-El MVP prioriza simplicidad, claridad técnica y base sólida para escalabilidad futura.
+Hover:
+- Oscurecer ligeramente el fondo.
+
+Secondary Button:
+
+- Fondo transparente
+- Border: 1px solid #1F3A5F
+- Texto: #1F3A5F
+
+Disabled:
+
+- Opacidad reducida
+- Cursor not-allowed
+
+---
+
+### 7.2 Inputs / Select / Textarea
+
+- Fondo: #FFFFFF
+- Border: 1px solid #E5E5E5
+- Border-radius: 8px
+- Padding: 12px
+- Font-size: 16px
+
+Focus:
+
+- Border-color: #1F3A5F
+- Eliminar outline azul por defecto
+- Aplicar sombra muy sutil
+
+Errores:
+
+- Border-color: #B23A3A
+- Mostrar mensaje de error debajo del campo
+
+---
+
+### 7.3 Cards
+
+- Fondo: #FFFFFF
+- Border-radius: 12px
+- Padding: 24px
+- Sombra ligera
+- Separación vertical mínima: 24px
+
+Las cards deben organizar el contenido en bloques claros.
+
+---
+
+### 7.4 Navbar
+
+- Fondo: #FFFFFF
+- Border-bottom: 1px solid #E5E5E5
+- Altura cómoda (mínimo 60px)
+- Título alineado a la izquierda
+- Información del usuario alineada a la derecha
+- Sin sidebar en el MVP
+
+---
+
+### 7.5 KPI Cards (Dashboard)
+
+- Número principal grande (28px o mayor)
+- Label descriptivo pequeño
+- Diseño centrado
+- Mucho espacio interno
+- Fondo blanco
+
+---
+
+### 7.6 Chart Container
+
+- Usar Card como contenedor
+- Padding generoso
+- Gráfico con colores suaves
+- Sin fondos oscuros
+
+---
+
+## 8. Interaction Principles
+
+- Una acción principal por pantalla.
+- Transiciones suaves (150ms–200ms).
+- No usar animaciones llamativas.
+- Evitar saturación visual.
+- Priorizar claridad sobre decoración.
+
+---
+
+## 9. Accessibility Guidelines
+
+- Mantener contraste suficiente entre texto y fondo.
+- Tamaño mínimo de texto: 14px.
+- Inputs y botones deben ser fácilmente clicables en móvil.
+- Estados hover y focus deben ser visibles.
+
+---
+
+## 10. Design Constraints (MVP)
+
+- No implementar dark mode en esta versión.
+- No usar frameworks de UI externos (Material UI, Bootstrap, etc.).
+- No agregar estilos fuera de este sistema.
+- Mantener coherencia visual en toda la aplicación.
+
+---
+
+Inspectra debe sentirse ligero, ordenado y preciso.
